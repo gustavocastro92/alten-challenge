@@ -174,9 +174,9 @@ paths:
   /reservations/{id}:
     put:
       tags:
-        - room
-      summary: 'Updates the room information'
-      operationId: updateRoom
+        - reservation
+      summary: 'Updates the reservation information'
+      operationId: updateReservation
       parameters:
         - name: id
           in: path
