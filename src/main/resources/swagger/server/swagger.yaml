@@ -68,7 +68,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /room/{id}:
+  /rooms/{id}:
     put:
       tags:
         - room
