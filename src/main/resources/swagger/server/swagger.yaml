@@ -103,10 +103,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /rooms/{id}/reservation:
+  /rooms/{id}/reservations:
     get:
       tags:
-        - Reservation
+        - reservation
       operationId: 'getReservation'
       parameters:
         - name: id
@@ -157,7 +157,7 @@ paths:
               $ref: '#/components/schemas/ReservationRequest'
       responses:
         '201':
-          description: Ok
+          description: Created
         '422':
           description: 'Incorrect parameters'
           content:
@@ -214,6 +214,7 @@ components:
       properties:
         dateStart:
           type: string
+          format: date-time
           example: '2021-09-14T17:32:28Z'
         dateEnd:
           type: string
