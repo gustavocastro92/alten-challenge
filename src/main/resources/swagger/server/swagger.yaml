@@ -1,0 +1,360 @@
+openapi: 3.0.2
+info:
+  title: Hotel API
+  description: "Project created for the technical challenge provided by Alten."
+  contact:
+    email: gustavogcastro1992@gmail.com
+
+  version: 0.0.1-SNAPSHOT
+
+paths:
+  /rooms:
+    get:
+      tags:
+        - room
+      summary: 'Get the hotel rooms'
+      operationId: getRooms
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomResponse'
+        '204':
+          description: 'Empty response'
+        '422':
+          description: 'Incorrect parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 'Internal Server Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - room
+      summary: 'Create a hotel room'
+      operationId: addRoom
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomRequest'
+      responses:
+        '201':
+          description: 'Successfully created'
+          headers:
+            location:
+              schema:
+                type: integer
+                description: 'Id of the room created'
+        '422':
+          description: 'Incorrect parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 'Internal Server Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /room/{id}:
+    put:
+      tags:
+        - room
+      summary: 'Updates the room information'
+      operationId: updateRoom
+      parameters:
+        - name: id
+          in: path
+          description: 'Room id'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomUpdateRequest'
+      responses:
+        '200':
+          description: 'Ok'
+        '422':
+          description: 'Incorrect parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 'Internal Server Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /rooms/{id}/reservation:
+    get:
+      tags:
+        - Reservation
+      operationId: 'getReservation'
+      parameters:
+        - name: id
+          in: path
+          description: 'Room id'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Get all room reservations'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+        '204':
+          description: 'Empty response'
+        '422':
+          description: 'Incorrect parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 'Internal Server Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - reservation
+      operationId: addReservation
+      parameters:
+        - name: id
+          in: path
+          description: 'Room id'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationRequest'
+      responses:
+        '201':
+          description: Ok
+        '422':
+          description: 'Incorrect parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 'Internal Server Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /reservations/{id}:
+    put:
+      tags:
+        - room
+      summary: 'Updates the room information'
+      operationId: updateRoom
+      parameters:
+        - name: id
+          in: path
+          description: 'Reservation id'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationUpdateRequest'
+      responses:
+        '200':
+          description: 'Ok'
+        '422':
+          description: 'Incorrect parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 'Internal Server Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+
+    Reservation:
+      type: object
+      properties:
+        dateStart:
+          type: string
+          example: '2021-09-14T17:32:28Z'
+        dateEnd:
+          type: string
+          format: date-time
+          example: '2021-09-17T17:32:28Z'
+        roomId:
+          type: integer
+          example: '123'
+
+    ReservationRequest:
+      allOf:
+        - $ref: '#/components/schemas/Reservation'
+        - type: object
+          properties:
+            userId:
+              description: 'Id of the user who is making the reservation'
+              type: integer
+
+    ReservationUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/Reservation'
+        - type: object
+          properties:
+            userId:
+              description: 'Id of the user who is making the reservation'
+              type: integer
+            reservationStatus:
+              $ref: '#/components/schemas/ReservationStatus'
+
+    ReservationResponse:
+      allOf:
+        - $ref: '#/components/schemas/Reservation'
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: 'Reservation id'
+            reservationStatus:
+              $ref: '#/components/schemas/ReservationStatus'
+
+    ReservationStatus:
+      type: string
+      enum:
+        - RESERVED
+        - INTERNAL_ERROR
+        - NOT_ACCEPTABLE
+        - CANCELED
+
+    Room:
+      type: object
+      properties:
+        roomNumber:
+          type: string
+          description: 'Physical room number'
+          example: '111A'
+        description:
+          type: string
+          description: 'Room description'
+          example: 'Only room available in the hotel'
+        beds:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoomBed'
+
+    RoomRequest:
+      allOf:
+        - $ref: '#/components/schemas/Room'
+        - type: object
+          properties:
+            userId:
+              description: 'Id of the user who is managing the room'
+              type: integer
+
+    RoomUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/Room'
+        - type: object
+          properties:
+            active:
+              type: object
+              description: 'Stores the information if the room is active. This is an administrative setting.'
+
+    RoomResponse:
+      allOf:
+        - $ref: '#/components/schemas/Room'
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: 'Room internal id'
+              example: '123'
+            status:
+              $ref: '#/components/schemas/RoomStatus'
+            reserved:
+              type: boolean
+              example: 'false'
+            active:
+              type: object
+              description: 'Stores the information if the room is active. This is an administrative setting.'
+
+    RoomStatus:
+      type: string
+      enum:
+        - AVAIBLE
+        - UNAVAIBLE
+
+    RoomBed:
+      allOf:
+        - $ref: '#/components/schemas/Bed'
+        - type: object
+          properties:
+            quantity:
+              type: integer
+              example: 2
+
+    Bed:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'Bed internal id'
+        type:
+          type: string
+          example: SINGLE
+          enum:
+            - SINGLE
+            - TWIN
+            - FULL
+
+    Error:
+      type: object
+      description: 'Default error class'
+      properties:
+        errorCode:
+          type: integer
+          description: 'Internal error code'
+          example: 1001
+        message:
+          type: string
+          description: 'Error message'
+          example: 'Invalid filter'
+
+servers:
+  - url: http://localhost:8080
