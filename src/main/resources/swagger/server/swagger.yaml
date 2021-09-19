@@ -14,6 +14,20 @@ paths:
         - room
       summary: 'Get the hotel rooms'
       operationId: getRooms
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: roomNumber
+          in: query
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: string
       responses:
         '200':
           description: 'Successful response'
@@ -81,6 +95,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -115,6 +130,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       responses:
         '200':
           description: 'Get all room reservations'
@@ -149,6 +165,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -184,6 +201,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -214,14 +232,18 @@ components:
       properties:
         dateStart:
           type: string
-          format: date-time
+          format: date
           example: '2021-09-14T17:32:28Z'
+          required: true
         dateEnd:
           type: string
-          format: date-time
+          format: date
           example: '2021-09-17T17:32:28Z'
+          required: true
         roomId:
+          required: true
           type: integer
+          format: int64
           example: '123'
 
     ReservationRequest:
@@ -232,6 +254,11 @@ components:
             userId:
               description: 'Id of the user who is making the reservation'
               type: integer
+            token:
+              description: 'Required to control reservations. If different from the room token, the reservation will not be made.'
+              required: true
+              type: string
+              format: uuid
 
     ReservationUpdateRequest:
       allOf:
@@ -241,7 +268,7 @@ components:
             userId:
               description: 'Id of the user who is making the reservation'
               type: integer
-            reservationStatus:
+            status:
               $ref: '#/components/schemas/ReservationStatus'
 
     ReservationResponse:
@@ -252,16 +279,15 @@ components:
             id:
               type: integer
               description: 'Reservation id'
-            reservationStatus:
+            status:
               $ref: '#/components/schemas/ReservationStatus'
 
     ReservationStatus:
       type: string
       enum:
-        - RESERVED
-        - INTERNAL_ERROR
-        - NOT_ACCEPTABLE
-        - CANCELED
+        - ACTIVE
+        - CANCELED_BY_USER
+        - CANCELED_BY_STAFF
 
     Room:
       type: object
@@ -269,15 +295,18 @@ components:
         roomNumber:
           type: string
           description: 'Physical room number'
-          example: '111A'
+          example: '221B'
         description:
           type: string
           description: 'Room description'
           example: 'Only room available in the hotel'
-        beds:
-          type: array
-          items:
-            $ref: '#/components/schemas/RoomBed'
+        status:
+          $ref: '#/components/schemas/RoomStatus'
+        token:
+          description: 'Required to control reservations. If different from the current one, the reservation will not be made.'
+          required: true
+          type: string
+          format: uuid
 
     RoomRequest:
       allOf:
@@ -291,11 +320,6 @@ components:
     RoomUpdateRequest:
       allOf:
         - $ref: '#/components/schemas/Room'
-        - type: object
-          properties:
-            active:
-              type: object
-              description: 'Stores the information if the room is active. This is an administrative setting.'
 
     RoomResponse:
       allOf:
@@ -306,43 +330,16 @@ components:
               type: integer
               description: 'Room internal id'
               example: '123'
-            status:
-              $ref: '#/components/schemas/RoomStatus'
-            reserved:
-              type: boolean
-              example: 'false'
-            active:
-              type: object
-              description: 'Stores the information if the room is active. This is an administrative setting.'
+            reservations:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReservationResponse'
 
     RoomStatus:
       type: string
       enum:
-        - AVAIBLE
-        - UNAVAIBLE
-
-    RoomBed:
-      allOf:
-        - $ref: '#/components/schemas/Bed'
-        - type: object
-          properties:
-            quantity:
-              type: integer
-              example: 2
-
-    Bed:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: 'Bed internal id'
-        type:
-          type: string
-          example: SINGLE
-          enum:
-            - SINGLE
-            - TWIN
-            - FULL
+        - ACTIVE
+        - INACTIVE
 
     Error:
       type: object
