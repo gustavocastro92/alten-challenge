@@ -15,7 +15,11 @@ First you need Java SDK 8 installed
 2. Use the command 'mvnw clean install' 
 3. Run the microservice using 'java -jar .target/alten-challenge-0.0.1-SNAPSHOT.jar'
 
-# Hot to use:
+# How to run:
+
+Use the command 'mvnw spring-boot:run' in the project directory.
+
+# How to use:
 
 This project uses the API First concept. It generates the necessary models and controllers from a YAML file in the OpenAPI standard, located at:
 
