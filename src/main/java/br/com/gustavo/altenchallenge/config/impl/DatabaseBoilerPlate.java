@@ -1,4 +1,4 @@
-package br.com.gustavo.altenchallenge.config;
+package br.com.gustavo.altenchallenge.config.impl;
 
 import br.com.gustavo.altenchallenge.enums.ReservationStatus;
 import br.com.gustavo.altenchallenge.enums.RoomStatus;
@@ -23,17 +23,12 @@ public class DatabaseBoilerPlate {
     @PostConstruct
     private void initDb() {
 
+        Room room = createRoom();
+        createReservation(room);
 
-        Room room = new Room();
-        room.setId(123L);
-        room.setDescription("The only room in the hotel");
-        room.setUserId("10120113391");
-        room.setRoomNumber("221B");
-        room.setStatus(RoomStatus.ACTIVE);
-        room.setToken(UUID.randomUUID());
+    }
 
-        Room saved = roomRepository.save(room);
-
+    private void createReservation(Room saved) {
         Reservation reservation = new Reservation();
         reservation.setCreated(LocalDate.now());
         reservation.setDateEnd(LocalDate.now().plusDays(3));
@@ -42,6 +37,17 @@ public class DatabaseBoilerPlate {
         reservation.setStatus(ReservationStatus.ACTIVE);
 
         reservationRepository.save(reservation);
+    }
 
+    private Room createRoom() {
+        Room room = new Room();
+        room.setId(123L);
+        room.setDescription("The only room in the hotel");
+        room.setUserId("10120113391");
+        room.setRoomNumber("221B");
+        room.setStatus(RoomStatus.ACTIVE);
+        room.setToken(UUID.randomUUID());
+
+        return roomRepository.save(room);
     }
 }
